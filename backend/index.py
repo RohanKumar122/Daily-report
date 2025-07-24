@@ -8,8 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-# CORS(app, resources={r"/*": {"origins": "*"}})
-CORS(app, resources={r"/*": {"origins": ["http://localhost:5000", "https://daily-report-ypil-b35k6ry9z-rohan-kumars-projects-3b796da9.vercel.app/","https://daily-report-ypil.vercel.app/"]}})
+CORS(app, resources={r"/*": {"origins": "*"}})
+# CORS(app, resources={r"/*": {"origins": ["http://localhost:5000", "https://daily-report-ypil-b35k6ry9z-rohan-kumars-projects-3b796da9.vercel.app/","https://daily-report-ypil.vercel.app/"]}})
 
 
 
