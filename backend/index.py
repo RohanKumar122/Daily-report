@@ -68,6 +68,9 @@ def delete_report():
         return jsonify({"message": "No report found to delete"}), 404
     return jsonify({"message": "Report deleted successfully"}), 200
 
+
+# Vercel expects a variable named `handler` as the app entry point
+handler = app
 # Uncomment below for local development
 # if __name__ == "__main__":
 #     app.run(debug=True, port=int(os.getenv("PORT", 5000)))
