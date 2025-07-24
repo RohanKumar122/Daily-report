@@ -69,5 +69,5 @@ def delete_report():
     return jsonify({"message": "Report deleted successfully"}), 200
 
 # Uncomment below for local development
-if __name__ == "__main__":
-    app.run(debug=True, port=int(os.getenv("PORT", 5000)))
+# if __name__ == "__main__":
+#     app.run(debug=True, port=int(os.getenv("PORT", 5000)))
