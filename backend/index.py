@@ -5,23 +5,18 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
-# Connect to MongoDB
-MONGO_URI = os.getenv("MONGO_URI")
-client = MongoClient(MONGO_URI)
+client = MongoClient(os.getenv("MONGO_URI"))
 db = client["daily_reports"]
 collection = db["reports"]
 
-# Routes
-@app.route("/", methods=["GET"])
+@app.route("/")
 def index():
-    return "Server is running!!"
+    return "Server is running on Vercel!"
 
 @app.route("/add", methods=["POST"])
 def add_report():
@@ -40,5 +35,5 @@ def get_reports():
     reports = list(collection.find({}, {"_id": 0}))
     return jsonify(reports)
 
-# Vercel expects a variable named `handler` as the app entry point
-handler = app
+# if __name__ == "__m`ain__":
+#     app.run(debug=True)`
