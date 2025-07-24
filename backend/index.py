@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client["daily_reports"]
