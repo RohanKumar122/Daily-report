@@ -100,7 +100,7 @@ function App() {
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-gray-600">
-                <Clock className="w-4 h-4" />
+                <Clock className=" hidden md:block w-4 h-4" />
                 <span className="hidden md:block text-sm font-medium">
                   {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
@@ -185,8 +185,9 @@ function App() {
           {/* Report List */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h2 className="text-xl font-bold text-gray-900">Report History</h2>
+              <h2 className="text-xl py-4 px-2 pr-2 pl-4 font-bold text-gray-900">Report History</h2>
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-2 py-4 border-b border-gray-200 flex justify-between items-center">
+                
                 <div className="relative">
                   <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <input
@@ -199,7 +200,7 @@ function App() {
                 </div>
                 <button
                   onClick={() => window.open(`${BACKEND_URL}/download`, "_blank")}
-                  className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+                  className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 mx-1 "
                   title="Download Excel"
                 >
                   <Download className="w-5 h-5" />
