@@ -4,6 +4,8 @@ from pymongo import MongoClient
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from bson import ObjectId
+
 
 load_dotenv()
 
@@ -38,8 +40,9 @@ def add_report():
 
 @app.route("/reports", methods=["GET"])
 def get_reports():
-    # Sort by most recent dateCreated
-    reports = list(collection.find({}, {"_id": 0}).sort("dateCreated", -1))
+    reports = list(collection.find({}).sort("dateCreated", -1))
+    for report in reports:
+        report["_id"] = str(report["_id"]) 
     return jsonify(reports), 200
 
 @app.route("/update", methods=["PUT"])
@@ -62,15 +65,21 @@ def update_report():
 
 @app.route("/delete", methods=["DELETE"])
 def delete_report():
-    data = request.json
-    if not data.get("date"):
-        return jsonify({"error": "Date is required for deletion"}), 400
+    data = request.get_json()
+    report_id = data.get("id")
 
-    result = collection.delete_one({"date": data["date"]})
+    if not report_id:
+        return jsonify({"error": "Report ID is required"}), 400
+
+    try:
+        result = collection.delete_one({"_id": ObjectId(report_id)})
+    except Exception as e:
+        return jsonify({"error": "Invalid ID format", "details": str(e)}), 400
+
     if result.deleted_count == 0:
         return jsonify({"message": "No report found to delete"}), 404
-    return jsonify({"message": "Report deleted successfully"}), 200
 
+    return jsonify({"message": "Report deleted successfully"}), 200
 
 # Vercel expects a variable namyyyyed `handler` as the app entry point
 # handler = app

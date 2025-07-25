@@ -53,13 +53,20 @@ function App() {
     setEditDate(r.date);
     setEditMode(true);
   };
-
-  const handleDelete = async (r) => {
-    if (window.confirm(`Delete report for ${r.date}?`)) {
-      await axios.delete(`${BACKEND_URL}/delete`, { data: { date: r.date } });
+const handleDelete = async (r) => {
+  if (window.confirm(`Delete report for ${r.date}?`)) {
+    try {
+      await axios.delete(`${BACKEND_URL}/delete`, {
+        data: { id: r._id },               // Make sure r._id exists
+      });
       fetchReports();
+    } catch (error) {
+      alert("Failed to delete the report.");
     }
-  };
+  }
+};
+
+
 
   const filteredReports = allReports.filter(r =>
     r.report.toLowerCase().includes(searchTerm.toLowerCase()) ||
