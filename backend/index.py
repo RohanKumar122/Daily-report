@@ -5,6 +5,9 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 from bson import ObjectId
+import csv
+from io import StringIO
+from flask import Response
 
 
 load_dotenv()
@@ -80,6 +83,39 @@ def delete_report():
         return jsonify({"message": "No report found to delete"}), 404
 
     return jsonify({"message": "Report deleted successfully"}), 200
+
+
+@app.route("/download", methods=["GET"])
+def download_csv():
+    reports = list(collection.find({}))
+    
+    # Create CSV in memory
+    output = StringIO()
+    writer = csv.writer(output)
+
+    # Write BOM for Excel compatibility
+    output.write('\ufeff')
+
+    # Write header
+    writer.writerow(["Date", "Report", "Note", "CreatedAt"])
+
+    for r in reports:
+        writer.writerow([
+            r.get("date", ""),
+            r.get("report", ""),
+            r.get("note", ""),
+            r.get("dateCreated", "")
+        ])
+
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={
+            "Content-Disposition": "attachment; filename=reports.csv",
+            "Content-Type": "text/csv; charset=utf-8"
+        }
+    )
 
 # Vercel expects a variable namyyyyed `handler` as the app entry point
 # handler = app

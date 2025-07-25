@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FileText, Calendar, User, Clock, Plus, Search, Trash, Edit } from "lucide-react";
+import { FileText, Calendar, User, Clock, Plus, Search, Trash, Edit,Download } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -65,7 +65,6 @@ const handleDelete = async (r) => {
     }
   }
 };
-
 
 
   const filteredReports = allReports.filter(r =>
@@ -198,6 +197,14 @@ const handleDelete = async (r) => {
                     className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
                   />
                 </div>
+             <button
+  onClick={() => window.open(`${BACKEND_URL}/download`, "_blank")}
+  className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+  title="Download CSV"
+>
+  <Download className="w-5 h-5" />
+</button>
+
               </div>
 
               <div className="max-h-96 overflow-y-auto divide-y divide-gray-100">
