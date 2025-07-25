@@ -8,7 +8,9 @@ from bson import ObjectId
 import csv
 from io import StringIO
 from flask import Response
-
+from flask import send_file
+from openpyxl import Workbook
+from io import BytesIO
 
 load_dotenv()
 
@@ -84,37 +86,47 @@ def delete_report():
 
     return jsonify({"message": "Report deleted successfully"}), 200
 
-
 @app.route("/download", methods=["GET"])
-def download_csv():
+def download_excel():
     reports = list(collection.find({}))
-    
-    # Create CSV in memory
-    output = StringIO()
-    writer = csv.writer(output)
 
-    # Write BOM for Excel compatibility
-    output.write('\ufeff')
+    # Sort by date ascending
+    def parse_date(report):
+        try:
+            return datetime.strptime(report.get("date", ""), "%Y-%m-%d")
+        except:
+            return datetime.min  # push invalid/missing dates to the top
 
-    # Write header
-    writer.writerow(["Date", "Report", "Note", "CreatedAt"])
+    reports.sort(key=parse_date)
 
+    # Create workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Reports"
+
+    # Write headers
+    headers = ["Date", "Report", "Note", "Created At"]
+    ws.append(headers)
+
+    # Write rows
     for r in reports:
-        writer.writerow([
+        ws.append([
             r.get("date", ""),
             r.get("report", ""),
             r.get("note", ""),
             r.get("dateCreated", "")
         ])
 
+    # Save to memory
+    output = BytesIO()
+    wb.save(output)
     output.seek(0)
-    return Response(
-        output.getvalue(),
-        mimetype="text/csv",
-        headers={
-            "Content-Disposition": "attachment; filename=reports.csv",
-            "Content-Type": "text/csv; charset=utf-8"
-        }
+
+    return send_file(
+        output,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        download_name="reports.xlsx",
+        as_attachment=True
     )
 
 # Vercel expects a variable namyyyyed `handler` as the app entry point
