@@ -132,5 +132,5 @@ def download_excel():
 # Vercel expects a variable namyyyyed `handler` as the app entry point
 # handler = app
 # Uncomment below for local development
-# if __name__ == "__main__":
-#     app.run(debug=True, port=int(os.getenv("PORT", 5000)))
+if __name__ == "__main__":
+    app.run(debug=True, port=int(os.getenv("PORT", 5000)))
