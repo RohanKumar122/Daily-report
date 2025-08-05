@@ -11,6 +11,7 @@ from flask import Response
 from flask import send_file
 from openpyxl import Workbook
 from io import BytesIO
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 
 load_dotenv()
 
@@ -23,6 +24,12 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client["daily_reports"]
 collection = db["reports"]
+
+def clean_excel_value(value):
+    if isinstance(value, str):
+        # keep normal chars + tab/newline/carriage return
+        return ''.join(ch for ch in value if ord(ch) >= 32 or ch in '\t\n\r')
+    return value
 
 @app.route("/")
 def index():
@@ -45,7 +52,7 @@ def add_report():
 
 @app.route("/reports", methods=["GET"])
 def get_reports():
-    reports = list(collection.find({}).sort("dateCreated", -1))
+    reports = list(collection.find({}).sort("date", -1))
     for report in reports:
         report["_id"] = str(report["_id"]) 
     return jsonify(reports), 200
@@ -86,38 +93,34 @@ def delete_report():
 
     return jsonify({"message": "Report deleted successfully"}), 200
 
+
 @app.route("/download", methods=["GET"])
 def download_excel():
     reports = list(collection.find({}))
 
-    # Sort by date ascending
     def parse_date(report):
         try:
             return datetime.strptime(report.get("date", ""), "%Y-%m-%d")
         except:
-            return datetime.min  # push invalid/missing dates to the top
+            return datetime.min
 
     reports.sort(key=parse_date)
 
-    # Create workbook
     wb = Workbook()
     ws = wb.active
     ws.title = "Reports"
 
-    # Write headers
-    headers = ["Date", "Report", "Note", "Created At"]
+    headers = ["Date", "Report", "Notes", "Created At"]
     ws.append(headers)
 
-    # Write rows
     for r in reports:
         ws.append([
-            r.get("date", ""),
-            r.get("report", ""),
-            r.get("note", ""),
-            r.get("dateCreated", "")
+            clean_excel_value(r.get("date", "")),
+            clean_excel_value(r.get("report", "")),
+            clean_excel_value(r.get("notes", "")),  # 🔥 fixed typo: "notes" not "note"
+            clean_excel_value(r.get("dateCreated", ""))
         ])
 
-    # Save to memory
     output = BytesIO()
     wb.save(output)
     output.seek(0)
